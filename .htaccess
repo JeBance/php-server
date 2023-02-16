@@ -1,0 +1,5 @@
+<Files index.php>
+	<IfModule mod_headers.c>
+		Header set Access-Control-Allow-Headers "*"
+	</IfModule>
+</Files>
