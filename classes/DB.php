@@ -3,9 +3,13 @@ class DB
 {
 	private $DB_DIR;
 
-	public function __construct($dbDir)
+	public function __construct($dbDir = null)
 	{	global $config;
-		$this->DB_DIR = $dbDir;
+		if ($dbDir == null) {
+			$this->DB_DIR = $config['DB'];
+		} else {
+			$this->DB_DIR = $dbDir;
+		}
 	}
 
 	public function check($TB_DIR = null)
@@ -59,6 +63,7 @@ class DB
 				do {
 					$data = file_get_contents($this->DB_DIR.$dir."/".$ID);
 				} while (empty($data));
+				$data = json_decode($data, true);
 				return $data;
 			} else {
 				return false;
@@ -68,13 +73,13 @@ class DB
 		}
 	}
 
-	public function save($TB_DIR = null, $data, $ID = null)
+	public function save($TB_DIR = null, $data = [], $ID = null)
 	{
 		if (empty($ID)) $ID = uID();
 		$dir = $this->check($TB_DIR);
 		if ($dir != false) {
 			$fcreate = fopen($this->DB_DIR.$dir."/".$ID, "w+");
-			fwrite($fcreate, $data);
+			fwrite($fcreate, json_encode($data));
 			fclose($fcreate);
 		} else {
 			return false;

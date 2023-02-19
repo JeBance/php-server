@@ -29,28 +29,12 @@ class GPG
 			if (is_array($array)) {
 				$result = $array;
 				if ((isset($info[0]['fingerprint'])) and (!empty($info[0]['fingerprint']))) {
-					$result['info']['sendersFingerprint'] = $info[0]['fingerprint'];
-					$result['info']['timestamp'] = $info[0]['timestamp'];
+					$result['from']['fingerprint'] = $info[0]['fingerprint'];
+					$result['from']['timestamp'] = $info[0]['timestamp'];
 				}
 			} else {
 				$result = false;
 			}
-		}
-		return $result;
-	}
-
-	// функция encrypt принимает массив, конвертирует в JSON и возвращает зашифрованную строку
-	public function encrypt($message = null)
-	{
-		$result = false;
-		if ((!empty($message)) and (is_array($message))) {
-			$res = gnupg_init();
-			gnupg_import($res, $this->privateKey);
-			$rtv = gnupg_setsignmode($res, GNUPG_SIG_MODE_NORMAL);
-			$rtv = gnupg_addsignkey($res, $this->fingerprint, $this->passphrase);
-			$rtv = gnupg_addencryptkey($res, $this->fingerprint);
-			$message = json_encode($message);
-			$result = gnupg_encryptsign($res, $message);
 		}
 		return $result;
 	}

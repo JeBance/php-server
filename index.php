@@ -29,24 +29,24 @@ if ((php_sapi_name() != 'cli') and (!empty($_REQUEST))) {
 					break;
 
 				case 'getNewMessages':
-					$DB = new DB($config['DB']);
-					$messages = $DB->scan($_POST['info']['sendersFingerprint']);
+					$DB = new DB();
+					$messages = $DB->scan($_POST['from']['fingerprint']);
 					if (!empty($messages)) {
-						$response = [];
+						$response = [ 'newMessages' => [] ];
 						for ($i = 0; $i < count($messages); $i++) {
-							$message = $DB->get($_POST['info']['sendersFingerprint'], $messages[$i]);
-							$response[$messages[$i]] = $message;
-							$DB->delete($_POST['info']['sendersFingerprint'], $messages[$i]);
+							$message = $DB->get($_POST['from']['fingerprint'], $messages[$i]);
+							$response['newMessages'][$messages[$i]] = $message;
+							$DB->delete($_POST['from']['fingerprint'], $messages[$i]);
 						}
 					}
 					break;
 
-				case 'sendMessage':
+				case ('sendMessage' || 'addMe'):
 					if ((isset($_POST['to'])) and (!empty($_POST['to'])) and (preg_match("/^[a-z0-9]{40}$/i", $_POST['to']))
 					and (isset($_POST['message'])) and (!empty($_POST['message']))) {
 						$uID = uID();
-						$DB = new DB($config['DB']);
-						$DB->save($_POST['to'], $_POST['message'], $uID);
+						$DB = new DB();
+						$DB->save($_POST['to'], $_POST, $uID);
 						$response = [ 'response' => $uID ];
 					}
 					break;
@@ -57,8 +57,10 @@ if ((php_sapi_name() != 'cli') and (!empty($_REQUEST))) {
 					break;
 			}
 
-			if ($response) $response = $gpg->encrypt($response);
-			if ($response) $result = [ 'result' => 'ok', 'response' => $response ];
+			if ($response) {
+				$result = [ 'result' => 'ok' ];
+				$result = array_merge($result, $response);
+			}
 		}
 	}
 }
