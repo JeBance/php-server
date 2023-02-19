@@ -30,9 +30,9 @@ if ((php_sapi_name() != 'cli') and (!empty($_REQUEST))) {
 
 				case 'getNewMessages':
 					$DB = new DB();
+					$response = [ 'newMessages' => [] ];
 					$messages = $DB->scan($_POST['from']['fingerprint']);
 					if (!empty($messages)) {
-						$response = [ 'newMessages' => [] ];
 						for ($i = 0; $i < count($messages); $i++) {
 							$message = $DB->get($_POST['from']['fingerprint'], $messages[$i]);
 							$response['newMessages'][$messages[$i]] = $message;
